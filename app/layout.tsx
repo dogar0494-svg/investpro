@@ -21,8 +21,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#0a0a14',
+  colorScheme: 'light',
+  themeColor: '#b8173f',
 }
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`dark ${poppins.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${poppins.variable} ${geistMono.variable}`}>
       <head>
         <link
           rel="stylesheet"
