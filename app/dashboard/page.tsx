@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCurrentUser, getSettings, getTransactions, getInvestments } from "@/lib/data"
+import { getCurrentUser, getSettings, getTransactions, getInvestments, getReferrals } from "@/lib/data"
 import { AppNav } from "@/components/app-nav"
 import { DepositDialog } from "@/components/deposit-dialog"
 import { WithdrawDialog } from "@/components/withdraw-dialog"
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { formatCurrency } from "@/lib/format"
+import { ReferralOverview } from "@/components/referral-overview"
 
 export default async function DashboardPage() {
   const { profile } = await getCurrentUser()
@@ -23,10 +24,11 @@ export default async function DashboardPage() {
         return data
       })()) ?? profile)
     : profile
-  const [settings, transactions, investments] = await Promise.all([
+  const [settings, transactions, investments, referrals] = await Promise.all([
     getSettings(),
     getTransactions(viewedProfile.id),
     getInvestments(viewedProfile.id),
+    getReferrals(viewedProfile.referral_code ?? ""),
   ])
 
   const activeInvestments = investments.filter((i) => i.status === "active")
@@ -38,7 +40,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-background pb-20 md:pb-0">
       {impersonation && <ImpersonationBanner userName={impersonation.targetName} />}
       <AppNav isAdmin={profile.role === "admin"} />
       <Toaster position="top-center" richColors />
@@ -56,14 +58,18 @@ export default async function DashboardPage() {
           <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-primary-foreground/70">Wallet Balance</p>
-              <p className="mt-1 text-4xl font-extrabold">{formatCurrency(profile.wallet_balance)}</p>
+              <p className="mt-1 text-4xl font-extrabold">{formatCurrency(viewedProfile.wallet_balance)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Withdrawable: {formatCurrency(Number(viewedProfile.wallet_balance) * 0.3)}</p>
             </div>
             <div className="flex w-full gap-3 sm:w-auto">
               <div className="w-full sm:w-32">
                 <DepositDialog settings={settings} userId={viewedProfile.id} />
               </div>
               <div className="w-full sm:w-32">
-                <WithdrawDialog settings={settings} balance={Number(viewedProfile.wallet_balance)} />
+                <WithdrawDialog
+                  settings={settings}
+                  balance={Number(viewedProfile.wallet_balance) * 0.3}
+                />
               </div>
             </div>
           </CardContent>
@@ -84,6 +90,10 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="mb-6">
+          <ReferralOverview referrals={referrals} earnings={Number(viewedProfile.referral_earnings ?? 0)} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-5">

@@ -69,7 +69,7 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("wallet_balance, referral_code")
+    .select("wallet_balance, withdrawable_balance, referral_code")
     .eq("id", user.id)
     .single()
   if (!profile) return { ok: false, error: "Profile not found." }
@@ -79,7 +79,18 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
   const { data: settings } = await supabase.from("settings").select("min_withdrawal").eq("id", "global").single()
   const min = Number(settings?.min_withdrawal ?? 500)
   if (amount < min) return { ok: false, error: `Minimum withdrawal is Rs ${min}.` }
-  if (amount > Number(profile.wallet_balance)) return { ok: false, error: "Insufficient wallet balance." }
+  const withdrawableBalance = Number(profile.wallet_balance) * 0.3
+  if (amount > withdrawableBalance) return { ok: false, error: "Insufficient withdrawable balance." }
+
+  const { data: existingPending } = await supabase
+    .from("transactions")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("type", "withdrawal")
+    .eq("status", "pending")
+    .limit(1)
+    .maybeSingle()
+  if (existingPending) return { ok: false, error: "You already have a pending withdrawal request." }
 
   // Validate referral eligibility before reserving funds or creating a pending request.
   const { data: hasAvailableReferral, error: eligibilityError } = await supabase.rpc("has_available_active_referral")
@@ -87,7 +98,10 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
     return { ok: false, error: withdrawalReferralError }
   }
 
-  // Reserve funds.
+  const feeAmount = Math.round(amount * 0.2 * 100) / 100
+  const netAmount = Math.round((amount - feeAmount) * 100) / 100
+
+  // Reserve the gross request amount; the user receives 80% after the fee.
   const { error: updErr } = await supabase
     .from("profiles")
     .update({ wallet_balance: Number(profile.wallet_balance) - amount })
@@ -98,10 +112,14 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
     user_id: user.id,
     type: "withdrawal",
     amount,
+    original_amount: amount,
+    fee_amount: feeAmount,
+    net_amount: netAmount,
+    withdrawal_date: new Date().toISOString().slice(0, 10),
     status: "pending",
     payment_method: paymentMethod,
     account_number: accountNumber,
-    description: `Withdrawal to ${paymentMethod} ${accountNumber}`,
+    description: `Withdrawal to ${paymentMethod} ${accountNumber} (net payout Rs ${netAmount})`,
   }).select("id").single()
   if (error || !withdrawal) {
     await supabase.from("profiles").update({ wallet_balance: Number(profile.wallet_balance) }).eq("id", user.id)

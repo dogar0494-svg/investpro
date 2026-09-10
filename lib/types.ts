@@ -6,6 +6,9 @@ export type Profile = {
   phone: string | null
   country: string
   wallet_balance: number
+  withdrawable_balance?: number | null
+  referral_earnings?: number | null
+  bonus_status?: string | null
   total_invested: number
   total_profit: number
   referral_code: string | null
@@ -37,6 +40,12 @@ export type Transaction = {
   user_id: string
   type: TxType
   amount: number
+  original_amount?: number | null
+  fee_amount?: number | null
+  net_amount?: number | null
+  withdrawal_date?: string | null
+  referral_level?: number | null
+  commission_rate?: number | null
   status: TxStatus
   payment_method: string | null
   account_number: string | null

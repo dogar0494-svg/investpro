@@ -45,45 +45,56 @@ export async function approveDeposit(txId: string): Promise<ActionResult> {
 
   await admin.from("transactions").update({ status: "approved", updated_at: new Date().toISOString() }).eq("id", txId)
 
-  // Referral bonus on the user's FIRST approved deposit.
-  if (profile.referred_by) {
-    const { count } = await admin
-      .from("transactions")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", tx.user_id)
-      .eq("type", "deposit")
-      .eq("status", "approved")
-    if ((count ?? 0) === 1) {
-      const { data: settings } = await admin
-        .from("settings")
-        .select("referral_bonus_percent")
-        .eq("id", "global")
-        .single()
-      const pct = Number(settings?.referral_bonus_percent ?? 5)
-      const bonus = (Number(tx.amount) * pct) / 100
+  // Credit one-time, duplicate-safe commissions for the first approved deposit.
+  const { count: approvedDeposits } = await admin
+    .from("transactions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", tx.user_id)
+    .eq("type", "deposit")
+    .eq("status", "approved")
+  if ((approvedDeposits ?? 0) === 1) {
+    const { data: settings } = await admin.from("settings").select("referral_bonus_percent").eq("id", "global").single()
+    const baseRate = Number(settings?.referral_bonus_percent ?? 5)
+    const rates = [baseRate, baseRate / 2, baseRate / 4]
+    let referredBy = profile.referred_by
 
+    for (let level = 1; level <= 3 && referredBy; level += 1) {
       const { data: referrer } = await admin
         .from("profiles")
-        .select("id, wallet_balance, total_profit")
-        .eq("referral_code", profile.referred_by)
+        .select("id, wallet_balance, total_profit, referral_earnings, referral_code, referred_by")
+        .eq("referral_code", referredBy)
         .maybeSingle()
-      if (referrer && bonus > 0) {
-        await admin
-          .from("profiles")
-          .update({
-            wallet_balance: Number(referrer.wallet_balance) + bonus,
-            total_profit: Number(referrer.total_profit) + bonus,
-          })
-          .eq("id", referrer.id)
-        await admin.from("transactions").insert({
+      if (!referrer) break
+
+      const rate = rates[level - 1]
+      const commission = (Number(tx.amount) * rate) / 100
+      if (commission > 0) {
+        const { data: inserted } = await admin.from("referral_commissions").insert({
           user_id: referrer.id,
-          type: "referral",
-          amount: bonus,
-          status: "completed",
-          referred_user_id: tx.user_id,
-          description: `Referral bonus (${pct}%)`,
-        })
+          source_user_id: tx.user_id,
+          source_transaction_id: tx.id,
+          level,
+          rate,
+          amount: commission,
+        }).select("id").maybeSingle()
+
+        if (inserted) {
+          await admin.from("profiles").update({
+            wallet_balance: Number(referrer.wallet_balance) + commission,
+            total_profit: Number(referrer.total_profit) + commission,
+            referral_earnings: Number(referrer.referral_earnings ?? 0) + commission,
+          }).eq("id", referrer.id)
+          await admin.from("transactions").insert({
+            user_id: referrer.id,
+            type: "referral",
+            amount: commission,
+            status: "completed",
+            referred_user_id: tx.user_id,
+            description: `Level ${level} referral commission (${rate}%)`,
+          })
+        }
       }
+      referredBy = referrer.referred_by
     }
   }
 
