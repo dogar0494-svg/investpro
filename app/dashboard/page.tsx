@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCurrentUser, getSettings, getTransactions, getInvestments } from "@/lib/data"
+import { getCurrentUser, getSettings, getTransactions, getInvestments, getReferrals } from "@/lib/data"
 import { AppNav } from "@/components/app-nav"
 import { DepositDialog } from "@/components/deposit-dialog"
 import { WithdrawDialog } from "@/components/withdraw-dialog"
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { formatCurrency } from "@/lib/format"
+import { ReferralOverview } from "@/components/referral-overview"
 
 export default async function DashboardPage() {
   const { profile } = await getCurrentUser()
@@ -23,10 +24,11 @@ export default async function DashboardPage() {
         return data
       })()) ?? profile)
     : profile
-  const [settings, transactions, investments] = await Promise.all([
+  const [settings, transactions, investments, referrals] = await Promise.all([
     getSettings(),
     getTransactions(viewedProfile.id),
     getInvestments(viewedProfile.id),
+    getReferrals(viewedProfile.referral_code ?? ""),
   ])
 
   const activeInvestments = investments.filter((i) => i.status === "active")
@@ -88,6 +90,10 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="mb-6">
+          <ReferralOverview referrals={referrals} earnings={Number(viewedProfile.referral_earnings ?? 0)} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-5">

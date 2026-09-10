@@ -206,7 +206,8 @@ export function AdminPanel({
                 <thead className="border-b border-border text-left text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 font-medium">User</th>
-                    <th className="px-4 py-3 font-medium">Amount</th>
+                    <th className="px-4 py-3 font-medium">Gross</th>
+                    <th className="px-4 py-3 font-medium">Net payout</th>
                     <th className="px-4 py-3 font-medium">Method</th>
                     <th className="px-4 py-3 font-medium">Account</th>
                     <th className="px-4 py-3 font-medium">Status</th>
@@ -217,7 +218,7 @@ export function AdminPanel({
                 <tbody>
                   {withdrawals.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                      <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
                         No withdrawals yet.
                       </td>
                     </tr>
@@ -229,6 +230,7 @@ export function AdminPanel({
                         <div className="text-xs text-muted-foreground">{w.user_email}</div>
                       </td>
                       <td className="px-4 py-3 font-semibold">{formatCurrency(w.amount)}</td>
+                      <td className="px-4 py-3 font-semibold text-primary">{formatCurrency(Number(w.net_amount ?? Number(w.amount) * 0.8))}</td>
                       <td className="px-4 py-3 capitalize">{w.payment_method}</td>
                       <td className="px-4 py-3 font-mono text-xs">{w.account_number}</td>
                       <td className="px-4 py-3">

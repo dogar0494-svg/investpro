@@ -82,6 +82,16 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
   const withdrawableBalance = Number(profile.withdrawable_balance ?? Number(profile.wallet_balance) * 0.3)
   if (amount > withdrawableBalance) return { ok: false, error: "Insufficient withdrawable balance." }
 
+  const { data: existingPending } = await supabase
+    .from("transactions")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("type", "withdrawal")
+    .eq("status", "pending")
+    .limit(1)
+    .maybeSingle()
+  if (existingPending) return { ok: false, error: "You already have a pending withdrawal request." }
+
   // Validate referral eligibility before reserving funds or creating a pending request.
   const { data: hasAvailableReferral, error: eligibilityError } = await supabase.rpc("has_available_active_referral")
   if (eligibilityError || !hasAvailableReferral) {
