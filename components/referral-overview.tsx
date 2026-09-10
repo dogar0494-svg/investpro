@@ -4,6 +4,7 @@ import type { Profile } from "@/lib/types"
 
 export function ReferralOverview({ referrals, earnings }: { referrals: Profile[]; earnings: number }) {
   const active = referrals.filter((referral) => referral.id)
+  const bonusUnlocked = active.length >= 100
 
   return (
     <Card className="border-border/60">
@@ -18,6 +19,12 @@ export function ReferralOverview({ referrals, earnings }: { referrals: Profile[]
         <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-sm">
           <span className="text-muted-foreground">Referral earnings</span>
           <span className="font-semibold">{formatCurrency(earnings)}</span>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
+          <span className="text-muted-foreground">100-referral bonus</span>
+          <span className={bonusUnlocked ? "font-semibold text-primary" : "font-medium"}>
+            {bonusUnlocked ? "$100,000 unlocked for admin review" : `${active.length}/100 active referrals`}
+          </span>
         </div>
         {referrals.length === 0 ? (
           <p className="text-sm text-muted-foreground">Share your referral code to build your network.</p>

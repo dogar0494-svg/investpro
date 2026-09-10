@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 
 const LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: "fa-gauge" },
+  { href: "/trading", label: "Trading", icon: "fa-chart-line" },
   { href: "/plans", label: "Plans", icon: "fa-layer-group" },
   { href: "/profile", label: "Profile", icon: "fa-user" },
 ]
@@ -86,6 +87,20 @@ export function AppNav({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </nav>
       )}
+
+      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border/70 bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.18)] backdrop-blur md:hidden" aria-label="Mobile navigation">
+        <div className="mx-auto flex max-w-md items-center justify-around">
+          {links.slice(0, 5).map((l) => {
+            const active = pathname === l.href
+            return (
+              <Link key={l.href} href={l.href} className={cn("flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[11px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
+                <i className={`fa-solid ${l.icon} text-base`} aria-hidden="true" />
+                <span className="truncate">{l.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
     </header>
   )
 }

@@ -40,7 +40,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-background pb-20 md:pb-0">
       {impersonation && <ImpersonationBanner userName={impersonation.targetName} />}
       <AppNav isAdmin={profile.role === "admin"} />
       <Toaster position="top-center" richColors />
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
             <div>
               <p className="text-sm text-primary-foreground/70">Wallet Balance</p>
               <p className="mt-1 text-4xl font-extrabold">{formatCurrency(viewedProfile.wallet_balance)}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Withdrawable: {formatCurrency(Number(viewedProfile.withdrawable_balance ?? Number(viewedProfile.wallet_balance) * 0.3))}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Withdrawable: {formatCurrency(Number(viewedProfile.wallet_balance) * 0.3)}</p>
             </div>
             <div className="flex w-full gap-3 sm:w-auto">
               <div className="w-full sm:w-32">
@@ -68,7 +68,7 @@ export default async function DashboardPage() {
               <div className="w-full sm:w-32">
                 <WithdrawDialog
                   settings={settings}
-                  balance={Number(viewedProfile.withdrawable_balance ?? Number(viewedProfile.wallet_balance) * 0.3)}
+                  balance={Number(viewedProfile.wallet_balance) * 0.3}
                 />
               </div>
             </div>

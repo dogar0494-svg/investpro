@@ -79,7 +79,7 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
   const { data: settings } = await supabase.from("settings").select("min_withdrawal").eq("id", "global").single()
   const min = Number(settings?.min_withdrawal ?? 500)
   if (amount < min) return { ok: false, error: `Minimum withdrawal is Rs ${min}.` }
-  const withdrawableBalance = Number(profile.withdrawable_balance ?? Number(profile.wallet_balance) * 0.3)
+  const withdrawableBalance = Number(profile.wallet_balance) * 0.3
   if (amount > withdrawableBalance) return { ok: false, error: "Insufficient withdrawable balance." }
 
   const { data: existingPending } = await supabase
