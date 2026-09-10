@@ -56,14 +56,18 @@ export default async function DashboardPage() {
           <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-primary-foreground/70">Wallet Balance</p>
-              <p className="mt-1 text-4xl font-extrabold">{formatCurrency(profile.wallet_balance)}</p>
+              <p className="mt-1 text-4xl font-extrabold">{formatCurrency(viewedProfile.wallet_balance)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Withdrawable: {formatCurrency(Number(viewedProfile.withdrawable_balance ?? Number(viewedProfile.wallet_balance) * 0.3))}</p>
             </div>
             <div className="flex w-full gap-3 sm:w-auto">
               <div className="w-full sm:w-32">
                 <DepositDialog settings={settings} userId={viewedProfile.id} />
               </div>
               <div className="w-full sm:w-32">
-                <WithdrawDialog settings={settings} balance={Number(viewedProfile.wallet_balance)} />
+                <WithdrawDialog
+                  settings={settings}
+                  balance={Number(viewedProfile.withdrawable_balance ?? Number(viewedProfile.wallet_balance) * 0.3)}
+                />
               </div>
             </div>
           </CardContent>

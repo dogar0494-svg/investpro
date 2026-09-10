@@ -6,6 +6,9 @@ export type Profile = {
   phone: string | null
   country: string
   wallet_balance: number
+  withdrawable_balance?: number | null
+  referral_earnings?: number | null
+  bonus_status?: string | null
   total_invested: number
   total_profit: number
   referral_code: string | null
