@@ -26,13 +26,19 @@ export async function proxy(request: NextRequest) {
     },
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const {
+      data: { user: currentUser },
+    } = await supabase.auth.getUser()
+    user = currentUser
+  } catch (error) {
+    console.error("[v0] Supabase session refresh failed", error)
+  }
 
   const path = request.nextUrl.pathname
 
-  const isProtected = PROTECTED_PREFIXES.some((p) => path.startsWith(p))
+  const isProtected = PROTECTED_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`))
   if (isProtected && !user) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
