@@ -25,7 +25,7 @@ export default async function DashboardPage() {
         return data
       })()) ?? profile)
     : profile
-  const results = await Promise.allSettled([
+  const [settings, transactions, investments, referrals, vipRewards, activeReferralCount] = await Promise.all([
     getSettings(),
     getTransactions(viewedProfile.id),
     getInvestments(viewedProfile.id),
@@ -33,15 +33,6 @@ export default async function DashboardPage() {
     getVipRewards(viewedProfile.id),
     getActiveReferralCount(viewedProfile.id),
   ])
-  const settings = results[0].status === "fulfilled" ? results[0].value : null
-  const transactions = results[1].status === "fulfilled" ? results[1].value : []
-  const investments = results[2].status === "fulfilled" ? results[2].value : []
-  const referrals = results[3].status === "fulfilled" ? results[3].value : []
-  const vipRewards = results[4].status === "fulfilled" ? results[4].value : []
-  const activeReferralCount = results[5].status === "fulfilled" ? results[5].value : 0
-  results.forEach((result, index) => {
-    if (result.status === "rejected") console.error(`[v0] Dashboard data load failed (${index})`, result.reason)
-  })
 
   const activeInvestments = investments.filter((i) => i.status === "active")
 
