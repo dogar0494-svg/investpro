@@ -7,15 +7,19 @@ const AUTH_PAGES = ["/login", "/register"]
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
-  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseUrl =
+    process.env.SUPABASE_URL ??
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??
+    "https://dvfkqojehiqrptxpnyaf.supabase.co"
   const supabaseKey =
     process.env.SUPABASE_ANON_KEY ??
     process.env.SUPABASE_PUBLISHABLE_KEY ??
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Supabase URL and publishable key are not configured")
+  // Keep public routes available when a preview has not injected the key yet.
+  if (!supabaseKey) {
+    return supabaseResponse
   }
 
   const supabase = createServerClient(
