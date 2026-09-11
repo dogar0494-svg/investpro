@@ -81,3 +81,22 @@ export async function getActiveReferralCount(userId: string): Promise<number> {
   const { data } = await supabase.rpc("referral_active_level1_count", { p_user_id: userId })
   return Number(data ?? 0)
 }
+
+export async function getTeam(userId: string, referralCode: string) {
+  const supabase = await createClient()
+  const { data: level1 } = await supabase
+    .from("profiles")
+    .select("id, username, name, referral_code, referred_by, created_at")
+    .eq("referred_by", referralCode)
+  const level1Rows = level1 ?? []
+  const level1Codes = level1Rows.map((member) => member.referral_code).filter(Boolean)
+  const { data: level2 } = level1Codes.length
+    ? await supabase.from("profiles").select("id, username, name, referral_code, referred_by, created_at").in("referred_by", level1Codes)
+    : { data: [] }
+  const level2Rows = level2 ?? []
+  const level2Codes = level2Rows.map((member) => member.referral_code).filter(Boolean)
+  const { data: level3 } = level2Codes.length
+    ? await supabase.from("profiles").select("id, username, name, referral_code, referred_by, created_at").in("referred_by", level2Codes)
+    : { data: [] }
+  return { level1, level2: level2Rows, level3: level3 ?? [] }
+}

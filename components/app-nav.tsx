@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 const LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: "fa-gauge" },
   { href: "/trading", label: "Trading", icon: "fa-chart-line" },
+  { href: "/team", label: "Team", icon: "fa-users" },
   { href: "/plans", label: "Plans", icon: "fa-layer-group" },
   { href: "/profile", label: "Profile", icon: "fa-user" },
 ]
@@ -50,17 +51,11 @@ export function AppNav({ isAdmin }: { isAdmin?: boolean }) {
           </form>
         </nav>
 
-        <button
-          className="flex h-9 w-9 items-center justify-center rounded-md text-foreground md:hidden"
-          onClick={() => setOpen((o) => !o)}
-          aria-label="Toggle menu"
-        >
-          <i className={`fa-solid ${open ? "fa-xmark" : "fa-bars"} text-lg`} aria-hidden="true" />
-        </button>
+        <span className="text-xs text-muted-foreground md:hidden">Account</span>
       </div>
 
       {open && (
-        <nav className="border-t border-border/60 px-4 py-3 md:hidden">
+        <nav className="hidden border-t border-border/60 px-4 py-3 md:hidden">
           <div className="flex flex-col gap-1">
             {links.map((l) => {
               const active = pathname === l.href

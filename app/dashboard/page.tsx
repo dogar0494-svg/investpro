@@ -43,7 +43,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background pb-20 md:pb-0">
+    <div className="flex min-h-dvh flex-col bg-background pb-24 md:pb-0">
       {impersonation && <ImpersonationBanner userName={impersonation.targetName} />}
       <AppNav isAdmin={profile.role === "admin"} />
       <Toaster position="top-center" richColors />
