@@ -16,11 +16,23 @@ export async function getCurrentUser(): Promise<{ profile: Profile }> {
 
   if (!user) redirect("/login")
 
-  // Accrue any owed profit before reading balances.
-  await accrueProfits(supabase, user.id)
+  // Profit accrual is best-effort; a stale investment row must not take down the dashboard.
+  try {
+    await accrueProfits(supabase, user.id)
+  } catch (error) {
+    console.error("[v0] Profit accrual failed", error)
+  }
 
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle()
 
+  if (profileError) {
+    console.error("[v0] Profile load failed", profileError.message)
+    throw new Error("Your account could not be loaded. Please refresh and try again.")
+  }
   if (!profile) redirect("/login")
   if (profile.is_blocked) redirect("/blocked")
 
