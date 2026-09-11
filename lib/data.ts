@@ -64,3 +64,20 @@ export async function getReferrals(referralCode: string): Promise<Profile[]> {
   const { data } = await supabase.from("profiles").select("*").eq("referred_by", referralCode)
   return (data as Profile[]) ?? []
 }
+
+export async function getVipRewards(userId: string) {
+  const supabase = await createClient()
+  await supabase.rpc("sync_vip_rewards", { p_user_id: userId })
+  const { data } = await supabase
+    .from("vip_reward_claims")
+    .select("tier, referrals_required, reward_amount, status")
+    .eq("user_id", userId)
+    .order("referrals_required", { ascending: true })
+  return data ?? []
+}
+
+export async function getActiveReferralCount(userId: string): Promise<number> {
+  const supabase = await createClient()
+  const { data } = await supabase.rpc("referral_active_level1_count", { p_user_id: userId })
+  return Number(data ?? 0)
+}
