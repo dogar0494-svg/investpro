@@ -102,24 +102,41 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
   const netAmount = Math.round((amount - feeAmount) * 100) / 100
 
   // Reserve the gross request amount; the user receives 80% after the fee.
-  const { error: atomicError } = await supabase.rpc("submit_withdrawal_atomic", {
-    p_user_id: user.id,
-    p_amount: amount,
-    p_payment_method: paymentMethod,
-    p_account_number: accountNumber,
-    p_fee_amount: feeAmount,
-    p_net_amount: netAmount,
-    p_withdrawal_date: new Date().toISOString().slice(0, 10),
+  const { error: updErr } = await supabase
+    .from("profiles")
+    .update({ wallet_balance: Number(profile.wallet_balance) - amount })
+    .eq("id", user.id)
+  if (updErr) return { ok: false, error: updErr.message }
+
+  const { data: withdrawal, error } = await supabase.from("transactions").insert({
+    user_id: user.id,
+    type: "withdrawal",
+    amount,
+    original_amount: amount,
+    fee_amount: feeAmount,
+    net_amount: netAmount,
+    withdrawal_date: new Date().toISOString().slice(0, 10),
+    status: "pending",
+    payment_method: paymentMethod,
+    account_number: accountNumber,
+    description: `Withdrawal to ${paymentMethod} ${accountNumber} (net payout Rs ${netAmount})`,
+  }).select("id").single()
+  if (error || !withdrawal) {
+    await supabase.from("profiles").update({ wallet_balance: Number(profile.wallet_balance) }).eq("id", user.id)
+    return { ok: false, error: error?.message ?? "Could not create withdrawal request." }
+  }
+
+  // Atomically claim one qualifying referral so each referral unlocks one withdrawal.
+  const { data: claimedReferral, error: claimError } = await supabase.rpc("claim_active_referral_for_withdrawal", {
+    p_withdrawal_transaction_id: withdrawal.id,
   })
-  if (atomicError) {
-    const message = atomicError.message.includes("pending") || atomicError.message.includes("referral")
-      ? withdrawalReferralError
-      : atomicError.message
-    return { ok: false, error: message }
+  if (claimError || !claimedReferral) {
+    await supabase.from("transactions").delete().eq("id", withdrawal.id).eq("user_id", user.id).eq("status", "pending")
+    await supabase.from("profiles").update({ wallet_balance: Number(profile.wallet_balance) }).eq("id", user.id)
+    return { ok: false, error: withdrawalReferralError }
   }
 
   revalidatePath("/dashboard")
-  revalidatePath("/admin")
   return { ok: true }
 }
 
