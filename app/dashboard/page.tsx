@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCurrentUser, getSettings, getTransactions, getInvestments, getReferrals } from "@/lib/data"
+import { getCurrentUser, getSettings, getTransactions, getInvestments, getReferrals, getVipRewards, getActiveReferralCount } from "@/lib/data"
 import { AppNav } from "@/components/app-nav"
 import { DepositDialog } from "@/components/deposit-dialog"
 import { WithdrawDialog } from "@/components/withdraw-dialog"
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { formatCurrency } from "@/lib/format"
 import { ReferralOverview } from "@/components/referral-overview"
+import { VipRewards } from "@/components/vip-rewards"
 
 export default async function DashboardPage() {
   const { profile } = await getCurrentUser()
@@ -24,11 +25,13 @@ export default async function DashboardPage() {
         return data
       })()) ?? profile)
     : profile
-  const [settings, transactions, investments, referrals] = await Promise.all([
+  const [settings, transactions, investments, referrals, vipRewards, activeReferralCount] = await Promise.all([
     getSettings(),
     getTransactions(viewedProfile.id),
     getInvestments(viewedProfile.id),
     getReferrals(viewedProfile.referral_code ?? ""),
+    getVipRewards(viewedProfile.id),
+    getActiveReferralCount(viewedProfile.id),
   ])
 
   const activeInvestments = investments.filter((i) => i.status === "active")
@@ -40,7 +43,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background pb-20 md:pb-0">
+    <div className="flex min-h-dvh flex-col bg-background pb-24 md:pb-0">
       {impersonation && <ImpersonationBanner userName={impersonation.targetName} />}
       <AppNav isAdmin={profile.role === "admin"} />
       <Toaster position="top-center" richColors />
@@ -92,8 +95,9 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        <div className="mb-6">
-          <ReferralOverview referrals={referrals} earnings={Number(viewedProfile.referral_earnings ?? 0)} />
+        <div className="mb-6 grid gap-6 lg:grid-cols-2">
+          <ReferralOverview referrals={referrals} earnings={Number(viewedProfile.referral_earnings ?? 0)} activeCount={activeReferralCount} />
+          <VipRewards activeCount={activeReferralCount} rewards={vipRewards} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-5">

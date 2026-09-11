@@ -35,7 +35,7 @@ export function WithdrawDialog({
 
   async function handleSubmit() {
     if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount.")
-    if (Number(amount) > balance) return toast.error("Insufficient wallet balance.")
+    if (Number(amount) > balance) return toast.error("Insufficient withdrawable balance.")
     if (!accountNumber) return toast.error("Enter your account number.")
     setLoading(true)
     try {
