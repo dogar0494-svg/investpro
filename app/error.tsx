@@ -21,7 +21,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           Please try again. Your account and balance are safe while we reconnect.
         </p>
       </div>
-      <Button type="button" onClick={() => reset()}>
+      <Button type="button" onClick={() => { reset(); window.location.reload() }}>
         Try again
       </Button>
     </main>

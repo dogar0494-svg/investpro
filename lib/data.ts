@@ -16,8 +16,12 @@ export async function getCurrentUser(): Promise<{ profile: Profile }> {
 
   if (!user) redirect("/login")
 
-  // Accrue any owed profit before reading balances.
-  await accrueProfits(supabase, user.id)
+  // Profit accrual is best-effort; a stale investment row must not take down the dashboard.
+  try {
+    await accrueProfits(supabase, user.id)
+  } catch (error) {
+    console.error("[v0] Profit accrual failed", error)
+  }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
