@@ -2,9 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/format"
 import type { Profile } from "@/lib/types"
 
-export function ReferralOverview({ referrals, earnings }: { referrals: Profile[]; earnings: number }) {
+export function ReferralOverview({ referrals, earnings, activeCount }: { referrals: Profile[]; earnings: number; activeCount: number }) {
   const active = referrals.filter((referral) => referral.id)
-  const bonusUnlocked = active.length >= 100
+  const bonusUnlocked = activeCount >= 100
 
   return (
     <Card className="border-border/60">
@@ -13,7 +13,7 @@ export function ReferralOverview({ referrals, earnings }: { referrals: Profile[]
           <CardTitle className="text-base">Referral network</CardTitle>
           <p className="text-sm text-muted-foreground">Level 1 referrals with approved deposits unlock withdrawals.</p>
         </div>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">{active.length} active</span>
+        <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">{activeCount} active</span>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-sm">
@@ -23,7 +23,7 @@ export function ReferralOverview({ referrals, earnings }: { referrals: Profile[]
         <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
           <span className="text-muted-foreground">100-referral bonus</span>
           <span className={bonusUnlocked ? "font-semibold text-primary" : "font-medium"}>
-            {bonusUnlocked ? "$100,000 unlocked for admin review" : `${active.length}/100 active referrals`}
+            {bonusUnlocked ? "$100,000 unlocked for admin review" : `${activeCount}/100 active referrals`}
           </span>
         </div>
         {referrals.length === 0 ? (
