@@ -70,7 +70,7 @@ export function WithdrawDialog({
           <DialogTitle>Withdraw funds</DialogTitle>
           <DialogDescription>
             Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)}</span>. Minimum
-            withdrawal {formatCurrency(min)}.
+            withdrawal {formatCurrency(min)}. No referral is required.
           </DialogDescription>
         </DialogHeader>
 

@@ -69,12 +69,10 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("wallet_balance, withdrawable_balance, referral_code")
+    .select("wallet_balance, withdrawable_balance")
     .eq("id", user.id)
     .single()
   if (!profile) return { ok: false, error: "Profile not found." }
-
-  const withdrawalReferralError = "Withdrawal Unavailable You must have at least one active referral who has made a successful deposit before you can withdraw your earnings."
 
   const { data: settings } = await supabase.from("settings").select("min_withdrawal").eq("id", "global").single()
   const min = Number(settings?.min_withdrawal ?? 500)
@@ -92,12 +90,6 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
     .maybeSingle()
   if (existingPending) return { ok: false, error: "You already have a pending withdrawal request." }
 
-  // Validate referral eligibility before reserving funds or creating a pending request.
-  const { data: hasAvailableReferral, error: eligibilityError } = await supabase.rpc("has_available_active_referral")
-  if (eligibilityError || !hasAvailableReferral) {
-    return { ok: false, error: withdrawalReferralError }
-  }
-
   const feeAmount = Math.round(amount * 0.2 * 100) / 100
   const netAmount = Math.round((amount - feeAmount) * 100) / 100
 
@@ -111,12 +103,7 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
     p_net_amount: netAmount,
     p_withdrawal_date: new Date().toISOString().slice(0, 10),
   })
-  if (atomicError) {
-    const message = atomicError.message.includes("pending") || atomicError.message.includes("referral")
-      ? withdrawalReferralError
-      : atomicError.message
-    return { ok: false, error: message }
-  }
+  if (atomicError) return { ok: false, error: atomicError.message }
 
   revalidatePath("/dashboard")
   revalidatePath("/admin")
