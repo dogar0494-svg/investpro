@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -12,7 +12,13 @@ const ELIGIBLE_USERS = new Set([
 
 export function SamsungOffer({ userId, activeReferrals }: { userId: string; activeReferrals: number }) {
   const [open, setOpen] = useState(false)
-  if (!ELIGIBLE_USERS.has(userId)) return null
+  const isEligible = ELIGIBLE_USERS.has(userId)
+
+  useEffect(() => {
+    if (isEligible) setOpen(true)
+  }, [isEligible])
+
+  if (!isEligible) return null
 
   return (
     <>
