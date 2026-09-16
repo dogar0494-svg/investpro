@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { formatCurrency } from "@/lib/format"
 import { ReferralOverview } from "@/components/referral-overview"
 import { VipRewards } from "@/components/vip-rewards"
+import { SamsungOffer } from "@/components/samsung-offer"
 
 export default async function DashboardPage() {
   const { profile } = await getCurrentUser()
@@ -64,6 +65,8 @@ export default async function DashboardPage() {
           </h1>
           <p className="text-sm text-muted-foreground">Here&apos;s an overview of your account.</p>
         </div>
+
+        <SamsungOffer userId={viewedProfile.id} activeReferrals={activeReferralCount} />
 
         {/* Balance hero */}
         <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/15 to-card">
