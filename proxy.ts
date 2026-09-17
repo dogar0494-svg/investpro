@@ -34,6 +34,13 @@ export async function proxy(request: NextRequest) {
     user = currentUser
   } catch (error) {
     console.error("[v0] Supabase session refresh failed", error)
+    if (error instanceof Error && error.message.toLowerCase().includes("refresh token")) {
+      for (const cookie of request.cookies.getAll()) {
+        if (cookie.name.startsWith("sb-") && cookie.name.includes("auth-token")) {
+          supabaseResponse.cookies.set(cookie.name, "", { maxAge: 0, path: "/" })
+        }
+      }
+    }
   }
 
   const path = request.nextUrl.pathname
