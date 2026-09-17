@@ -10,11 +10,18 @@ import { redirect } from "next/navigation"
  */
 export async function getCurrentUser(): Promise<{ profile: Profile }> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user
+  try {
+    const {
+      data: { user: currentUser },
+    } = await supabase.auth.getUser()
+    user = currentUser
+  } catch (error) {
+    console.error("[v0] Account session is invalid", error)
+    redirect("/login?reason=session-expired")
+  }
 
-  if (!user) redirect("/login")
+  if (!user) redirect("/login?reason=session-expired")
 
   // Profit accrual is best-effort; a stale investment row must not take down the dashboard.
   try {
