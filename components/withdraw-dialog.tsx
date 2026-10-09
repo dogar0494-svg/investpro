@@ -70,7 +70,7 @@ export function WithdrawDialog({
           <DialogTitle>Withdraw funds</DialogTitle>
           <DialogDescription>
             Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)}</span>. Minimum
-            withdrawal {formatCurrency(min)}. No referral or deposit is required.
+            withdrawal. No referral, deposit, minimum, or daily limit is required.
           </DialogDescription>
         </DialogHeader>
 

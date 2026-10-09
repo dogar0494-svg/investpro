@@ -69,26 +69,12 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("wallet_balance, withdrawable_balance")
+    .select("wallet_balance")
     .eq("id", user.id)
     .single()
   if (!profile) return { ok: false, error: "Profile not found." }
 
-  const { data: settings } = await supabase.from("settings").select("min_withdrawal").eq("id", "global").single()
-  const min = Number(settings?.min_withdrawal ?? 500)
-  if (amount < min) return { ok: false, error: `Minimum withdrawal is Rs ${min}.` }
-  const withdrawableBalance = Number(profile.wallet_balance) * 0.3
-  if (amount > withdrawableBalance) return { ok: false, error: "Insufficient withdrawable balance." }
-
-  const { data: existingPending } = await supabase
-    .from("transactions")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("type", "withdrawal")
-    .eq("status", "pending")
-    .limit(1)
-    .maybeSingle()
-  if (existingPending) return { ok: false, error: "You already have a pending withdrawal request." }
+  if (amount > Number(profile.wallet_balance)) return { ok: false, error: "Insufficient balance." }
 
   const feeAmount = Math.round(amount * 0.2 * 100) / 100
   const netAmount = Math.round((amount - feeAmount) * 100) / 100

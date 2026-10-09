@@ -69,12 +69,12 @@ export default async function DashboardPage() {
         <SamsungOffer userId={viewedProfile.id} activeReferrals={activeReferralCount} />
 
         {/* Balance hero */}
-        <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/15 to-card">
+        <Card className="mb-6 overflow-hidden border-0 bg-gradient-to-br from-[#4b168f] via-[#722fc1] to-[#c94ce9] text-white shadow-[0_18px_50px_rgba(109,38,185,0.38)]">
           <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm text-primary-foreground/70">Wallet Balance</p>
-              <p className="mt-1 text-4xl font-extrabold">{formatCurrency(viewedProfile.wallet_balance)}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Withdrawable: {formatCurrency(Number(viewedProfile.wallet_balance) * 0.3)}</p>
+              <p className="text-sm text-white/75">Total Balance</p>
+              <p className="mt-1 text-4xl font-extrabold text-white">{formatCurrency(viewedProfile.wallet_balance)}</p>
+              <p className="mt-1 text-xs text-white/70">100% of your balance is available to withdraw.</p>
             </div>
             <div className="flex w-full gap-3 sm:w-auto">
               <div className="w-full sm:w-32">
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
               <div className="w-full sm:w-32">
                 <WithdrawDialog
                   settings={settings}
-                  balance={Number(viewedProfile.wallet_balance) * 0.3}
+                  balance={Number(viewedProfile.wallet_balance)}
                 />
               </div>
             </div>
