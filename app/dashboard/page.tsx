@@ -53,7 +53,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background pb-24 md:pb-0">
+    <div className="bubble-dashboard flex min-h-dvh flex-col overflow-x-hidden bg-background pb-24 md:pb-0">
       {impersonation && <ImpersonationBanner userName={impersonation.targetName} />}
       <AppNav isAdmin={profile.role === "admin"} />
       <Toaster position="top-center" richColors />
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
         <SamsungOffer userId={viewedProfile.id} activeReferrals={activeReferralCount} />
 
         {/* Balance hero */}
-        <Card className="mb-6 overflow-hidden border-0 bg-gradient-to-br from-[#4b168f] via-[#722fc1] to-[#c94ce9] text-white shadow-[0_18px_50px_rgba(109,38,185,0.38)]">
+        <Card className="mb-6 overflow-hidden border-0 bg-gradient-to-br from-[#4b168f] via-[#722fc1] to-[#c94ce9] text-white shadow-[0_12px_30px_rgba(109,38,185,0.28)]">
           <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-white/75">Total Balance</p>

@@ -17,7 +17,7 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
     easypaisa_number: settings?.easypaisa_number ?? "",
     easypaisa_name: settings?.easypaisa_name ?? "",
     referral_bonus_percent: String(settings?.referral_bonus_percent ?? 5),
-    min_withdrawal: String(settings?.min_withdrawal ?? 500),
+    min_withdrawal: "0",
   })
   const [loading, setLoading] = useState(false)
 
@@ -92,7 +92,7 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
             />
           </div>
           <div className="flex flex-1 flex-col gap-2">
-            <Label htmlFor="min-wd">Minimum withdrawal (Rs)</Label>
+            <Label htmlFor="min-wd">Minimum withdrawal (disabled)</Label>
             <Input
               id="min-wd"
               type="number"

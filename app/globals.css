@@ -100,6 +100,55 @@
   --sidebar-ring: oklch(0.55 0.22 310);
 }
 
+.bubble-dashboard {
+  position: relative;
+  isolation: isolate;
+  background-image:
+    radial-gradient(circle at 8% 16%, oklch(0.99 0.04 330 / 0.85) 0 5rem, transparent 5.1rem),
+    radial-gradient(circle at 92% 30%, oklch(0.86 0.16 330 / 0.5) 0 7rem, transparent 7.1rem),
+    radial-gradient(circle at 18% 72%, oklch(0.98 0.04 300 / 0.65) 0 4rem, transparent 4.1rem),
+    radial-gradient(circle at 88% 84%, oklch(0.8 0.15 300 / 0.4) 0 5.5rem, transparent 5.6rem),
+    linear-gradient(145deg, oklch(0.96 0.05 315), oklch(0.91 0.1 330));
+}
+
+.bubble-dashboard::before,
+.bubble-dashboard::after {
+  position: absolute;
+  z-index: -1;
+  border: 1px solid oklch(1 0 0 / 0.45);
+  border-radius: 999px;
+  content: "";
+  pointer-events: none;
+}
+
+.bubble-dashboard::before {
+  top: 8rem;
+  right: -4rem;
+  width: 15rem;
+  height: 15rem;
+  box-shadow: inset 0 0 28px oklch(1 0 0 / 0.28), 0 0 28px oklch(0.7 0.18 320 / 0.18);
+}
+
+.bubble-dashboard::after {
+  bottom: 9rem;
+  left: -6rem;
+  width: 18rem;
+  height: 18rem;
+  box-shadow: inset 0 0 32px oklch(1 0 0 / 0.32), 0 0 30px oklch(0.7 0.18 320 / 0.15);
+}
+
+@media (max-width: 640px) {
+  .bubble-dashboard {
+    background-image:
+      radial-gradient(circle at 10% 12%, oklch(0.99 0.04 330 / 0.8) 0 3.5rem, transparent 3.6rem),
+      radial-gradient(circle at 92% 35%, oklch(0.86 0.16 330 / 0.4) 0 4.5rem, transparent 4.6rem),
+      linear-gradient(145deg, oklch(0.96 0.05 315), oklch(0.91 0.1 330));
+  }
+
+  .bubble-dashboard::before { top: 16rem; right: -7rem; width: 13rem; height: 13rem; }
+  .bubble-dashboard::after { bottom: 14rem; left: -8rem; width: 15rem; height: 15rem; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -31,8 +31,6 @@ export function WithdrawDialog({
   const [accountNumber, setAccountNumber] = useState("")
   const [loading, setLoading] = useState(false)
 
-  const min = Number(settings?.min_withdrawal ?? 500)
-
   async function handleSubmit() {
     if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount.")
     if (Number(amount) > balance) return toast.error("Insufficient withdrawable balance.")
@@ -69,8 +67,7 @@ export function WithdrawDialog({
         <DialogHeader>
           <DialogTitle>Withdraw funds</DialogTitle>
           <DialogDescription>
-            Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)}</span>. Minimum
-            withdrawal. No referral, deposit, minimum, or daily limit is required.
+            Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)}</span>. Your full balance is available; no referral, deposit, minimum, or daily limit is required.
           </DialogDescription>
         </DialogHeader>
 
@@ -93,10 +90,10 @@ export function WithdrawDialog({
             <Input
               id="wd-amount"
               type="number"
-              min={min}
+              min={0}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder={`Min ${min}`}
+              placeholder="Enter any amount"
             />
           </div>
 
