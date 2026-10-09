@@ -50,7 +50,7 @@ export async function submitDeposit(formData: FormData): Promise<ActionResult> {
 }
 
 /**
- * Submit a withdrawal request. Validates against wallet balance and minimum,
+ * Submit a withdrawal request. Validates against the full wallet balance,
  * immediately reserves (debits) the amount from the wallet, and creates a
  * pending `withdrawal` transaction. If an admin rejects it, the amount is
  * refunded (see admin actions).
