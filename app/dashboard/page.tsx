@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCurrentUser, getSettings, getTransactions, getInvestments, getReferrals, getVipRewards, getActiveReferralCount } from "@/lib/data"
+import { getCurrentUser, getSettings, getTransactions, getInvestments } from "@/lib/data"
 import { AppNav } from "@/components/app-nav"
 import { DepositDialog } from "@/components/deposit-dialog"
 import { WithdrawDialog } from "@/components/withdraw-dialog"
@@ -11,9 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { formatCurrency } from "@/lib/format"
-import { ReferralOverview } from "@/components/referral-overview"
-import { VipRewards } from "@/components/vip-rewards"
-import { SamsungOffer } from "@/components/samsung-offer"
 
 export default async function DashboardPage() {
   const { profile } = await getCurrentUser()
@@ -30,16 +27,10 @@ export default async function DashboardPage() {
     getSettings(),
     getTransactions(viewedProfile.id),
     getInvestments(viewedProfile.id),
-    getReferrals(viewedProfile.referral_code ?? ""),
-    getVipRewards(viewedProfile.id),
-    getActiveReferralCount(viewedProfile.id),
   ])
   const settings = results[0].status === "fulfilled" ? results[0].value : null
   const transactions = results[1].status === "fulfilled" ? results[1].value : []
   const investments = results[2].status === "fulfilled" ? results[2].value : []
-  const referrals = results[3].status === "fulfilled" ? results[3].value : []
-  const vipRewards = results[4].status === "fulfilled" ? results[4].value : []
-  const activeReferralCount = results[5].status === "fulfilled" ? results[5].value : 0
   results.forEach((result, index) => {
     if (result.status === "rejected") console.error(`[v0] Dashboard data load failed (${index})`, result.reason)
   })
@@ -66,10 +57,8 @@ export default async function DashboardPage() {
           <p className="text-sm text-muted-foreground">Here&apos;s an overview of your account.</p>
         </div>
 
-        <SamsungOffer userId={viewedProfile.id} activeReferrals={activeReferralCount} />
-
         {/* Balance hero */}
-        <Card className="mb-6 overflow-hidden border-0 bg-gradient-to-br from-[#4b168f] via-[#722fc1] to-[#c94ce9] text-white shadow-[0_12px_30px_rgba(109,38,185,0.28)]">
+        <Card id="withdraw" className="mb-6 overflow-hidden border-0 bg-gradient-to-br from-[#4b168f] via-[#722fc1] to-[#c94ce9] text-white shadow-[0_12px_30px_rgba(109,38,185,0.28)]">
           <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-white/75">Total Balance</p>
@@ -90,6 +79,24 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
+        <div className="mb-8 grid grid-cols-3 gap-4 sm:grid-cols-6">
+          {[
+            ["/plans", "Deposit", "fa-wallet", "from-pink-400 to-rose-500"],
+            ["/dashboard#withdraw", "Withdraw", "fa-arrow-up", "from-violet-500 to-indigo-600"],
+            ["/plans", "My Plans", "fa-layer-group", "from-fuchsia-400 to-purple-600"],
+            ["/team", "My Team", "fa-users", "from-indigo-400 to-violet-600"],
+            ["/profile", "History", "fa-receipt", "from-rose-400 to-pink-500"],
+            ["/profile", "Profile", "fa-user", "from-emerald-400 to-teal-500"],
+          ].map(([href, label, icon, color]) => (
+            <Link key={label} href={href} className="group flex flex-col items-center gap-2 text-center text-xs font-semibold text-foreground">
+              <span className={`flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${color} text-white shadow-[0_8px_20px_rgba(113,47,193,0.25)] ring-4 ring-white/60 transition-transform group-hover:scale-105`}>
+                <i className={`fa-solid ${icon} text-xl`} aria-hidden="true" />
+              </span>
+              {label}
+            </Link>
+          ))}
+        </div>
+
         {/* Stats */}
         <div className="mb-8 grid gap-4 sm:grid-cols-3">
           {stats.map((s) => (
@@ -105,11 +112,6 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        <div className="mb-6 grid gap-6 lg:grid-cols-2">
-          <ReferralOverview referrals={referrals} earnings={Number(viewedProfile.referral_earnings ?? 0)} activeCount={activeReferralCount} />
-          <VipRewards activeCount={activeReferralCount} rewards={vipRewards} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-5">
