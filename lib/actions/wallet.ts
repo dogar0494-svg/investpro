@@ -120,7 +120,7 @@ export async function investInPlan(formData: FormData): Promise<ActionResult> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("wallet_balance, total_invested")
+    .select("wallet_balance, total_invested, total_profit")
     .eq("id", user.id)
     .single()
   if (!profile) return { ok: false, error: "Profile not found." }
@@ -145,22 +145,34 @@ export async function investInPlan(formData: FormData): Promise<ActionResult> {
   })
   if (invErr) return { ok: false, error: invErr.message }
 
+  const firstDayProfit = (amount * Number(plan.daily_profit)) / 100
   await supabase
     .from("profiles")
     .update({
-      wallet_balance: Number(profile.wallet_balance) - amount,
+      wallet_balance: Number(profile.wallet_balance) - amount + firstDayProfit,
       total_invested: Number(profile.total_invested) + amount,
+      total_profit: Number((profile as { total_profit?: number }).total_profit ?? 0) + firstDayProfit,
     })
     .eq("id", user.id)
 
-  await supabase.from("transactions").insert({
-    user_id: user.id,
-    type: "investment",
-    amount,
-    status: "completed",
-    plan_id: plan.id,
-    description: `Invested in ${plan.name}`,
-  })
+  await supabase.from("transactions").insert([
+    {
+      user_id: user.id,
+      type: "investment",
+      amount,
+      status: "completed",
+      plan_id: plan.id,
+      description: `Invested in ${plan.name}`,
+    },
+    {
+      user_id: user.id,
+      type: "profit",
+      amount: firstDayProfit,
+      status: "completed",
+      plan_id: plan.id,
+      description: `Instant first-day profit from ${plan.name}`,
+    },
+  ])
 
   revalidatePath("/dashboard")
   revalidatePath("/plans")
