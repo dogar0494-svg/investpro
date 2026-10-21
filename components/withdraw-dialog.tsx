@@ -26,7 +26,7 @@ export function WithdrawDialog({
   balance: number
 }) {
   const [open, setOpen] = useState(false)
-  const [method, setMethod] = useState("JazzCash")
+  const [method, setMethod] = useState("USDT-BSC")
   const [amount, setAmount] = useState("")
   const [accountNumber, setAccountNumber] = useState("")
   const [loading, setLoading] = useState(false)
@@ -65,9 +65,9 @@ export function WithdrawDialog({
       />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Withdraw funds</DialogTitle>
+          <DialogTitle>Withdraw USDT</DialogTitle>
           <DialogDescription>
-            Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)}</span>. Your full balance is available; no referral, deposit, minimum, or daily limit is required.
+            Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)} USDT</span>. Network fee: {method === "USDT-TRC20" ? "0 USDT" : "0.01 USDT"}.
           </DialogDescription>
         </DialogHeader>
 
@@ -79,14 +79,16 @@ export function WithdrawDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="JazzCash">JazzCash</SelectItem>
-                <SelectItem value="Easypaisa">Easypaisa</SelectItem>
+                <SelectItem value="USDT-BSC">USDT · BSC</SelectItem>
+                <SelectItem value="USDT-opBNB">USDT · opBNB</SelectItem>
+                <SelectItem value="USDT-POL">USDT · Polygon (POL)</SelectItem>
+                <SelectItem value="USDT-TRC20">USDT · TRC20</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="wd-amount">Amount (Rs)</Label>
+            <Label htmlFor="wd-amount">Amount (USDT)</Label>
             <Input
               id="wd-amount"
               type="number"
@@ -98,12 +100,12 @@ export function WithdrawDialog({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="wd-acc">Your account number</Label>
+            <Label htmlFor="wd-acc">Your USDT wallet address</Label>
             <Input
               id="wd-acc"
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
-              placeholder="03XXXXXXXXX"
+              placeholder="0x... or T..."
             />
           </div>
 

@@ -81,4 +81,8 @@ export type Settings = {
   easypaisa_name: string | null
   referral_bonus_percent: number
   min_withdrawal: number
+  usdt_bsc_address: string | null
+  usdt_opbnb_address: string | null
+  usdt_polygon_address: string | null
+  usdt_trc20_address: string | null
 }

@@ -18,6 +18,10 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
     easypaisa_name: settings?.easypaisa_name ?? "",
     referral_bonus_percent: String(settings?.referral_bonus_percent ?? 5),
     min_withdrawal: "0",
+    usdt_bsc_address: settings?.usdt_bsc_address ?? "",
+    usdt_opbnb_address: settings?.usdt_opbnb_address ?? "",
+    usdt_polygon_address: settings?.usdt_polygon_address ?? "",
+    usdt_trc20_address: settings?.usdt_trc20_address ?? "",
   })
   const [loading, setLoading] = useState(false)
 
@@ -35,6 +39,10 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
       easypaisa_name: form.easypaisa_name,
       referral_bonus_percent: Number(form.referral_bonus_percent),
       min_withdrawal: Number(form.min_withdrawal),
+      usdt_bsc_address: form.usdt_bsc_address,
+      usdt_opbnb_address: form.usdt_opbnb_address,
+      usdt_polygon_address: form.usdt_polygon_address,
+      usdt_trc20_address: form.usdt_trc20_address,
     })
     setLoading(false)
     if (res.ok) toast.success("Settings saved.")
@@ -43,37 +51,23 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
 
   return (
     <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-2">
-      <Card className="border-border/60">
+      <Card className="border-border/60 lg:col-span-2">
         <CardHeader>
-          <CardTitle>JazzCash</CardTitle>
-          <CardDescription>Account users send deposits to.</CardDescription>
+          <CardTitle>USDT receiving wallets</CardTitle>
+          <CardDescription>Users will see the address for their selected network when depositing.</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="jc-num">Account number</Label>
-            <Input id="jc-num" value={form.jazzcash_number} onChange={(e) => update("jazzcash_number", e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="jc-name">Account name</Label>
-            <Input id="jc-name" value={form.jazzcash_name} onChange={(e) => update("jazzcash_name", e.target.value)} />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/60">
-        <CardHeader>
-          <CardTitle>EasyPaisa</CardTitle>
-          <CardDescription>Account users send deposits to.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="ep-num">Account number</Label>
-            <Input id="ep-num" value={form.easypaisa_number} onChange={(e) => update("easypaisa_number", e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="ep-name">Account name</Label>
-            <Input id="ep-name" value={form.easypaisa_name} onChange={(e) => update("easypaisa_name", e.target.value)} />
-          </div>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          {([
+            ["usdt_bsc_address", "USDT · BSC"],
+            ["usdt_opbnb_address", "USDT · opBNB"],
+            ["usdt_polygon_address", "USDT · Polygon (POL)"],
+            ["usdt_trc20_address", "USDT · TRC20"],
+          ] as const).map(([key, label]) => (
+            <div key={key} className="flex flex-col gap-2">
+              <Label htmlFor={key}>{label} wallet address</Label>
+              <Input id={key} value={form[key]} onChange={(e) => update(key, e.target.value)} placeholder="Paste wallet address" />
+            </div>
+          ))}
         </CardContent>
       </Card>
 
