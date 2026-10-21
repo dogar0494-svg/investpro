@@ -1,6 +1,13 @@
+export const PKR_PER_USD = 280
+
 export function formatCurrency(amount: number): string {
   const n = Number(amount) || 0
-  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return "Rs " + n.toLocaleString("en-PK", { maximumFractionDigits: 2 })
+}
+
+export function formatUsdFromPkr(amount: number): string {
+  const n = (Number(amount) || 0) / PKR_PER_USD
+  return "≈ $" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 export function formatUsdt(amount: number): string {

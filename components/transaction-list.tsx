@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import { formatCurrency, formatDateTime } from "@/lib/format"
+import { formatCurrency, formatDateTime, formatUsdFromPkr } from "@/lib/format"
 import type { Transaction, TxType, TxStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -59,6 +59,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
                 {credit ? "+" : "-"}
                 {formatCurrency(t.amount)}
               </span>
+              <span className="text-[10px] text-muted-foreground">{formatUsdFromPkr(t.amount)} USDT</span>
               <Badge className={cn("text-[10px] capitalize", statusVariant(t.status))}>{t.status}</Badge>
             </div>
           </li>
