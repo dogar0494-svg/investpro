@@ -24,7 +24,8 @@ export async function submitDeposit(formData: FormData): Promise<ActionResult> {
   const { supabase, user } = await requireUser()
   if (!user) return { ok: false, error: "Not authenticated." }
 
-  const amount = Number(formData.get("amount"))
+  const usdtAmount = Number(formData.get("amount"))
+  const amount = Math.round(usdtAmount * 280 * 100) / 100
   const paymentMethod = String(formData.get("payment_method") || "")
   const accountNumber = String(formData.get("account_number") || "")
   const proofImage = String(formData.get("proof_image") || "")
@@ -76,7 +77,8 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   if (amount > Number(profile.wallet_balance)) return { ok: false, error: "Insufficient balance." }
 
-  const feeAmount = paymentMethod === "USDT-BSC" ? 0.01 : paymentMethod === "USDT-opBNB" ? 0.015 : paymentMethod === "USDT-POL" ? 0.03 : paymentMethod === "USDT-TRC20" ? 1.5 : 0
+  const networkFeeUsdt = paymentMethod === "USDT-BSC" ? 0.01 : paymentMethod === "USDT-opBNB" ? 0.015 : paymentMethod === "USDT-POL" ? 0.03 : paymentMethod === "USDT-TRC20" ? 1.5 : 0
+  const feeAmount = Math.round(networkFeeUsdt * 280 * 100) / 100
   const netAmount = Math.round((amount - feeAmount) * 100) / 100
 
   // Reserve the gross request amount; the user receives 80% after the fee.
