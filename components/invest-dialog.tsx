@@ -75,7 +75,7 @@ export function InvestDialog({
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="inv-amount">Amount (Rs)</Label>
+            <Label htmlFor="inv-amount">Amount (USDT)</Label>
             <Input
               id="inv-amount"
               type="number"

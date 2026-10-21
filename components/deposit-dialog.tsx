@@ -17,6 +17,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import type { Settings } from "@/lib/types"
+import { getUsdtNetworkFee, formatUsdt } from "@/lib/format"
 
 export function DepositDialog({ settings, userId }: { settings: Settings | null; userId: string }) {
   const [open, setOpen] = useState(false)
@@ -78,7 +79,7 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Deposit USDT</DialogTitle>
-          <DialogDescription>Send USDT to the selected network address, then upload your transaction proof.</DialogDescription>
+          <DialogDescription>Send USDT from Binance to the selected address and network, then upload your transaction proof.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
@@ -98,9 +99,10 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
           </div>
 
           <div className="rounded-lg border border-border bg-muted/40 p-4 text-sm">
-            <p className="text-muted-foreground">Send payment to:</p>
+            <p className="text-muted-foreground">Send from Binance to:</p>
             <p className="mt-1 font-semibold">{accountInfo.label}</p>
             <p className="break-all font-mono text-base text-primary">{accountInfo.address ?? "Address not configured"}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Binance withdrawal fee: {formatUsdt(getUsdtNetworkFee(method))}</p>
           </div>
 
           <div className="flex flex-col gap-2">

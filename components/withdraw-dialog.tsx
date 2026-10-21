@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { formatCurrency } from "@/lib/format"
+import { formatCurrency, formatUsdt, getUsdtNetworkFee } from "@/lib/format"
 import type { Settings } from "@/lib/types"
 
 export function WithdrawDialog({
@@ -33,7 +33,8 @@ export function WithdrawDialog({
 
   async function handleSubmit() {
     if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount.")
-    if (Number(amount) > balance) return toast.error("Insufficient withdrawable balance.")
+    const networkFee = getUsdtNetworkFee(method)
+    if (Number(amount) > balance) return toast.error(`Insufficient balance. Available: ${formatUsdt(balance)}.`)
     if (!accountNumber) return toast.error("Enter your account number.")
     setLoading(true)
     try {
@@ -67,7 +68,7 @@ export function WithdrawDialog({
         <DialogHeader>
           <DialogTitle>Withdraw USDT</DialogTitle>
           <DialogDescription>
-            Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)} USDT</span>. Network fee: {method === "USDT-TRC20" ? "0 USDT" : "0.01 USDT"}.
+            Available balance: <span className="font-semibold text-foreground">{formatUsdt(balance)}</span>. Binance network fee: <span className="font-semibold text-foreground">{formatUsdt(getUsdtNetworkFee(method))}</span>. You receive {formatUsdt(Math.max(0, Number(amount || 0) - getUsdtNetworkFee(method)))}.
           </DialogDescription>
         </DialogHeader>
 

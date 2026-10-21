@@ -76,7 +76,7 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   if (amount > Number(profile.wallet_balance)) return { ok: false, error: "Insufficient balance." }
 
-  const feeAmount = paymentMethod === "USDT-TRC20" ? 0 : 0.01
+  const feeAmount = paymentMethod === "USDT-BSC" ? 0.01 : paymentMethod === "USDT-opBNB" ? 0.015 : paymentMethod === "USDT-POL" ? 0.03 : paymentMethod === "USDT-TRC20" ? 1.5 : 0
   const netAmount = Math.round((amount - feeAmount) * 100) / 100
 
   // Reserve the gross request amount; the user receives 80% after the fee.
@@ -114,7 +114,7 @@ export async function investInPlan(formData: FormData): Promise<ActionResult> {
   if (!amount || amount < Number(plan.min_deposit) || amount > Number(plan.max_deposit)) {
     return {
       ok: false,
-      error: `Amount must be between Rs ${plan.min_deposit} and Rs ${plan.max_deposit}.`,
+      error: `Amount must be between $${plan.min_deposit} and $${plan.max_deposit}.`,
     }
   }
 
