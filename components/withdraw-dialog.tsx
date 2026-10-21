@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { formatCurrency, formatUsdt, getUsdtNetworkFee } from "@/lib/format"
+import { formatCurrency, formatUsdt, formatUsdFromPkr, getUsdtNetworkFee } from "@/lib/format"
 import type { Settings } from "@/lib/types"
 
 export function WithdrawDialog({
@@ -33,8 +33,7 @@ export function WithdrawDialog({
 
   async function handleSubmit() {
     if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount.")
-    const networkFee = getUsdtNetworkFee(method)
-    if (Number(amount) > balance) return toast.error(`Insufficient balance. Available: ${formatUsdt(balance)}.`)
+    if (Number(amount) > balance) return toast.error(`Insufficient balance. Available: ${formatCurrency(balance)} (${formatUsdFromPkr(balance)} USDT).`)
     if (!accountNumber) return toast.error("Enter your account number.")
     setLoading(true)
     try {
@@ -59,7 +58,7 @@ export function WithdrawDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button variant="outline" className="w-full">
+          <Button className="w-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90">
             <i className="fa-solid fa-arrow-up-from-bracket mr-2" aria-hidden="true" /> Withdraw
           </Button>
         }
@@ -68,7 +67,7 @@ export function WithdrawDialog({
         <DialogHeader>
           <DialogTitle>Withdraw USDT</DialogTitle>
           <DialogDescription>
-            Available balance: <span className="font-semibold text-foreground">{formatUsdt(balance)}</span>. Binance network fee: <span className="font-semibold text-foreground">{formatUsdt(getUsdtNetworkFee(method))}</span>. You receive {formatUsdt(Math.max(0, Number(amount || 0) - getUsdtNetworkFee(method)))}.
+            Available balance: <span className="font-semibold text-foreground">{formatCurrency(balance)}</span> ({formatUsdFromPkr(balance)} USDT). Binance network fee: <span className="font-semibold text-foreground">{formatUsdt(getUsdtNetworkFee(method))}</span>. You receive {formatCurrency(Math.max(0, Number(amount || 0) - getUsdtNetworkFee(method) * 280))} ({formatUsdFromPkr(Math.max(0, Number(amount || 0) - getUsdtNetworkFee(method) * 280))} USDT).
           </DialogDescription>
         </DialogHeader>
 
@@ -89,15 +88,16 @@ export function WithdrawDialog({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="wd-amount">Amount (USDT)</Label>
+            <Label htmlFor="wd-amount">Amount (PKR)</Label>
             <Input
               id="wd-amount"
               type="number"
               min={0}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter any amount"
+              placeholder="e.g. 7000"
             />
+            <p className="text-xs text-muted-foreground">Approximate USDT: {formatUsdFromPkr(Number(amount || 0))}</p>
           </div>
 
           <div className="flex flex-col gap-2">

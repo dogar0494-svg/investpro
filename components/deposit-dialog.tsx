@@ -17,7 +17,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import type { Settings } from "@/lib/types"
-import { getUsdtNetworkFee, formatUsdt } from "@/lib/format"
+import { getUsdtNetworkFee, formatUsdt, formatCurrency, formatUsdFromPkr } from "@/lib/format"
 
 export function DepositDialog({ settings, userId }: { settings: Settings | null; userId: string }) {
   const [open, setOpen] = useState(false)
@@ -106,7 +106,7 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="dep-amount">Amount (USDT)</Label>
+            <Label htmlFor="dep-amount">Deposit amount (USDT)</Label>
             <Input
               id="dep-amount"
               type="number"
@@ -115,6 +115,7 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
               onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g. 25.00"
             />
+            <p className="text-xs text-muted-foreground">Wallet credit: {formatCurrency(Number(amount || 0) * 280)} ({formatUsdFromPkr(Number(amount || 0) * 280)} USDT)</p>
           </div>
 
           <div className="flex flex-col gap-2">
