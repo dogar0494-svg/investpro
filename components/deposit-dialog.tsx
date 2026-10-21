@@ -20,16 +20,19 @@ import type { Settings } from "@/lib/types"
 
 export function DepositDialog({ settings, userId }: { settings: Settings | null; userId: string }) {
   const [open, setOpen] = useState(false)
-  const [method, setMethod] = useState("JazzCash")
+  const [method, setMethod] = useState("USDT-BSC")
   const [amount, setAmount] = useState("")
   const [accountNumber, setAccountNumber] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const accountInfo =
-    method === "JazzCash"
-      ? { number: settings?.jazzcash_number, name: settings?.jazzcash_name }
-      : { number: settings?.easypaisa_number, name: settings?.easypaisa_name }
+  const networkDetails = {
+    "USDT-BSC": { label: "USDT · BSC", address: settings?.usdt_bsc_address },
+    "USDT-opBNB": { label: "USDT · opBNB", address: settings?.usdt_opbnb_address },
+    "USDT-POL": { label: "USDT · Polygon (POL)", address: settings?.usdt_polygon_address },
+    "USDT-TRC20": { label: "USDT · TRC20", address: settings?.usdt_trc20_address },
+  } as const
+  const accountInfo = networkDetails[method as keyof typeof networkDetails]
 
   async function handleSubmit() {
     if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount.")
@@ -51,7 +54,7 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
       const res = await submitDeposit(fd)
       if (!res.ok) throw new Error(res.error)
 
-      toast.success("Deposit request submitted! Awaiting admin approval.")
+      toast.success("USDT deposit submitted! Awaiting admin approval.")
       setOpen(false)
       setAmount("")
       setAccountNumber("")
@@ -74,8 +77,8 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
       />
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Deposit funds</DialogTitle>
-          <DialogDescription>Send payment to the account below, then upload your proof.</DialogDescription>
+          <DialogTitle>Deposit USDT</DialogTitle>
+          <DialogDescription>Send USDT to the selected network address, then upload your transaction proof.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
@@ -86,37 +89,39 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="JazzCash">JazzCash</SelectItem>
-                <SelectItem value="Easypaisa">Easypaisa</SelectItem>
+                <SelectItem value="USDT-BSC">USDT · BSC</SelectItem>
+                <SelectItem value="USDT-opBNB">USDT · opBNB</SelectItem>
+                <SelectItem value="USDT-POL">USDT · Polygon (POL)</SelectItem>
+                <SelectItem value="USDT-TRC20">USDT · TRC20</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="rounded-lg border border-border bg-muted/40 p-4 text-sm">
             <p className="text-muted-foreground">Send payment to:</p>
-            <p className="mt-1 font-semibold">{accountInfo.name ?? "InvestPro Admin"}</p>
-            <p className="font-mono text-base text-primary">{accountInfo.number ?? "—"}</p>
+            <p className="mt-1 font-semibold">{accountInfo.label}</p>
+            <p className="break-all font-mono text-base text-primary">{accountInfo.address ?? "Address not configured"}</p>
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="dep-amount">Amount (Rs)</Label>
+            <Label htmlFor="dep-amount">Amount (USDT)</Label>
             <Input
               id="dep-amount"
               type="number"
               min={1}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="e.g. 5000"
+              placeholder="e.g. 25.00"
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="dep-acc">Your sending number (optional)</Label>
+            <Label htmlFor="dep-acc">Your sending wallet address (optional)</Label>
             <Input
               id="dep-acc"
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
-              placeholder="03XXXXXXXXX"
+              placeholder="0x... or T..."
             />
           </div>
 

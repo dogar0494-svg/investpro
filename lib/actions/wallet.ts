@@ -76,7 +76,7 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   if (amount > Number(profile.wallet_balance)) return { ok: false, error: "Insufficient balance." }
 
-  const feeAmount = Math.round(amount * 0.2 * 100) / 100
+  const feeAmount = paymentMethod === "USDT-TRC20" ? 0 : 0.01
   const netAmount = Math.round((amount - feeAmount) * 100) / 100
 
   // Reserve the gross request amount; the user receives 80% after the fee.
