@@ -1,6 +1,6 @@
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { formatCurrency, formatDate } from "@/lib/format"
+import { formatCurrency, formatDate, formatUsdFromPkr } from "@/lib/format"
 import type { Investment } from "@/lib/types"
 
 export function InvestmentCard({ investment }: { investment: Investment }) {
@@ -18,6 +18,7 @@ export function InvestmentCard({ investment }: { investment: Investment }) {
         <div>
           <h3 className="font-semibold">{investment.plan_name}</h3>
           <p className="text-sm text-muted-foreground">{formatCurrency(investment.amount)} invested</p>
+          <p className="text-xs text-muted-foreground">{formatUsdFromPkr(investment.amount)} USDT value</p>
         </div>
         <Badge className={completed ? "bg-muted text-muted-foreground" : "bg-success/15 text-success"}>
           {completed ? "Completed" : "Active"}

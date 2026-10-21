@@ -10,7 +10,7 @@ import { InvestmentCard } from "@/components/investment-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
-import { formatCurrency } from "@/lib/format"
+import { formatCurrency, formatUsdFromPkr } from "@/lib/format"
 
 export default async function DashboardPage() {
   const { profile } = await getCurrentUser()
@@ -63,6 +63,7 @@ export default async function DashboardPage() {
             <div>
               <p className="text-sm text-white/75">Total Balance</p>
               <p className="mt-1 text-4xl font-extrabold text-white">{formatCurrency(viewedProfile.wallet_balance)}</p>
+              <p className="text-sm text-white/80">{formatUsdFromPkr(viewedProfile.wallet_balance)} USDT value</p>
               <p className="mt-1 text-xs text-white/70">100% of your balance is available to withdraw.</p>
             </div>
             <div className="flex w-full gap-3 sm:w-auto">
