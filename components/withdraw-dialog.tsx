@@ -21,9 +21,11 @@ import type { Settings } from "@/lib/types"
 export function WithdrawDialog({
   settings,
   balance,
+  shortcut = false,
 }: {
   settings: Settings | null
   balance: number
+  shortcut?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [method, setMethod] = useState("USDT-BSC")
@@ -58,8 +60,15 @@ export function WithdrawDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button className="w-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90">
-            <i className="fa-solid fa-arrow-up-from-bracket mr-2" aria-hidden="true" /> Withdraw
+          <Button className={shortcut ? "dashboard-shortcut dashboard-shortcut--withdraw" : "w-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90"}>
+            {shortcut ? (
+              <>
+                <span className="dashboard-shortcut-orb"><i className="fa-solid fa-wallet" aria-hidden="true" /></span>
+                <span>Withdraw</span>
+              </>
+            ) : (
+              <><i className="fa-solid fa-arrow-up-from-bracket mr-2" aria-hidden="true" /> Withdraw</>
+            )}
           </Button>
         }
       />

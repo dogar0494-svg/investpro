@@ -19,7 +19,7 @@ import { toast } from "sonner"
 import type { Settings } from "@/lib/types"
 import { getUsdtNetworkFee, formatUsdt, formatCurrency, formatUsdFromPkr } from "@/lib/format"
 
-export function DepositDialog({ settings, userId }: { settings: Settings | null; userId: string }) {
+export function DepositDialog({ settings, userId, shortcut = false }: { settings: Settings | null; userId: string; shortcut?: boolean }) {
   const [open, setOpen] = useState(false)
   const [method, setMethod] = useState("USDT-BSC")
   const [amount, setAmount] = useState("")
@@ -71,8 +71,15 @@ export function DepositDialog({ settings, userId }: { settings: Settings | null;
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button className="w-full">
-            <i className="fa-solid fa-plus mr-2" aria-hidden="true" /> Deposit
+          <Button className={shortcut ? "dashboard-shortcut dashboard-shortcut--deposit" : "w-full"}>
+            {shortcut ? (
+              <>
+                <span className="dashboard-shortcut-orb"><i className="fa-solid fa-building-columns" aria-hidden="true" /></span>
+                <span>Deposit</span>
+              </>
+            ) : (
+              <><i className="fa-solid fa-plus mr-2" aria-hidden="true" /> Deposit</>
+            )}
           </Button>
         }
       />
