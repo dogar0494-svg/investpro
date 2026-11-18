@@ -220,7 +220,6 @@ export async function savePaymentSettings(formData: {
   easypaisa_number: string
   easypaisa_name: string
   referral_bonus_percent: number
-  min_withdrawal: number
   usdt_bsc_address: string
   usdt_opbnb_address: string
   usdt_polygon_address: string
@@ -237,12 +236,11 @@ export async function savePaymentSettings(formData: {
       easypaisa_number: formData.easypaisa_number,
       easypaisa_name: formData.easypaisa_name,
       referral_bonus_percent: formData.referral_bonus_percent,
-  min_withdrawal: formData.min_withdrawal,
-  usdt_bsc_address: formData.usdt_bsc_address,
-  usdt_opbnb_address: formData.usdt_opbnb_address,
-  usdt_polygon_address: formData.usdt_polygon_address,
-  usdt_trc20_address: formData.usdt_trc20_address,
-  })
+      usdt_bsc_address: formData.usdt_bsc_address,
+      usdt_opbnb_address: formData.usdt_opbnb_address,
+      usdt_polygon_address: formData.usdt_polygon_address,
+      usdt_trc20_address: formData.usdt_trc20_address,
+    })
     .eq("id", "global")
   revalidatePath("/admin")
   return { ok: true }

@@ -17,7 +17,6 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
     easypaisa_number: settings?.easypaisa_number ?? "",
     easypaisa_name: settings?.easypaisa_name ?? "",
     referral_bonus_percent: String(settings?.referral_bonus_percent ?? 5),
-    min_withdrawal: "0",
     usdt_bsc_address: settings?.usdt_bsc_address ?? "",
     usdt_opbnb_address: settings?.usdt_opbnb_address ?? "",
     usdt_polygon_address: settings?.usdt_polygon_address ?? "",
@@ -38,7 +37,6 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
       easypaisa_number: form.easypaisa_number,
       easypaisa_name: form.easypaisa_name,
       referral_bonus_percent: Number(form.referral_bonus_percent),
-      min_withdrawal: Number(form.min_withdrawal),
       usdt_bsc_address: form.usdt_bsc_address,
       usdt_opbnb_address: form.usdt_opbnb_address,
       usdt_polygon_address: form.usdt_polygon_address,
@@ -83,15 +81,6 @@ export function PaymentSettingsForm({ settings }: { settings: Settings | null })
               type="number"
               value={form.referral_bonus_percent}
               onChange={(e) => update("referral_bonus_percent", e.target.value)}
-            />
-          </div>
-          <div className="flex flex-1 flex-col gap-2">
-            <Label htmlFor="min-wd">Minimum withdrawal (disabled)</Label>
-            <Input
-              id="min-wd"
-              type="number"
-              value={form.min_withdrawal}
-              onChange={(e) => update("min_withdrawal", e.target.value)}
             />
           </div>
         </CardContent>

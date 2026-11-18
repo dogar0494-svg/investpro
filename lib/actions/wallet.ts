@@ -61,11 +61,18 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
   if (!user) return { ok: false, error: "Not authenticated." }
 
   const amount = Number(formData.get("amount"))
-  const paymentMethod = String(formData.get("payment_method") || "")
-  const accountNumber = String(formData.get("account_number") || "")
+  const paymentMethod = String(formData.get("payment_method") || "").trim()
+  const accountNumber = String(formData.get("account_number") || "").trim()
+  const networkFees: Record<string, number> = {
+    "USDT-BSC": 0.01,
+    "USDT-opBNB": 0.015,
+    "USDT-POL": 0.03,
+    "USDT-TRC20": 1.5,
+  }
 
-  if (!amount || amount <= 0) return { ok: false, error: "Enter a valid amount." }
-  if (!paymentMethod) return { ok: false, error: "Select a payment method." }
+  if (!Number.isFinite(amount) || amount <= 0) return { ok: false, error: "Enter a valid amount." }
+  const networkFeeUsdt = networkFees[paymentMethod]
+  if (networkFeeUsdt === undefined) return { ok: false, error: "Select a valid payment method." }
   if (!accountNumber) return { ok: false, error: "Enter your account number." }
 
   const { data: profile } = await supabase
@@ -77,11 +84,10 @@ export async function submitWithdrawal(formData: FormData): Promise<ActionResult
 
   if (amount > Number(profile.wallet_balance)) return { ok: false, error: "Insufficient balance." }
 
-  const networkFeeUsdt = paymentMethod === "USDT-BSC" ? 0.01 : paymentMethod === "USDT-opBNB" ? 0.015 : paymentMethod === "USDT-POL" ? 0.03 : paymentMethod === "USDT-TRC20" ? 1.5 : 0
   const feeAmount = Math.round(networkFeeUsdt * 280 * 100) / 100
-  const netAmount = Math.round((amount - feeAmount) * 100) / 100
+  const netAmount = Math.max(0, Math.round((amount - feeAmount) * 100) / 100)
 
-  // Reserve the gross request amount; the user receives 80% after the fee.
+  // The atomic RPC recomputes the fee and validates the balance before reserving funds.
   const { error: atomicError } = await supabase.rpc("submit_withdrawal_atomic", {
     p_user_id: user.id,
     p_amount: amount,

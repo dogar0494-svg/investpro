@@ -6,7 +6,6 @@ export type Profile = {
   phone: string | null
   country: string
   wallet_balance: number
-  withdrawable_balance?: number | null
   referral_earnings?: number | null
   bonus_status?: string | null
   total_invested: number
@@ -80,7 +79,6 @@ export type Settings = {
   easypaisa_number: string | null
   easypaisa_name: string | null
   referral_bonus_percent: number
-  min_withdrawal: number
   usdt_bsc_address: string | null
   usdt_opbnb_address: string | null
   usdt_polygon_address: string | null
